@@ -4,14 +4,15 @@
     margin: 0;
     padding: 20px;
   }
-.event-feed-container {
+  .event-feed-container {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    max-width: 1200px; /* Widened this so multiple cards can fit */
+    max-width: 1200px; 
     margin: 0 auto;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* THIS is the magic grid line! */
+    /* This creates the responsive grid so cards sit side-by-side */
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
     gap: 20px;
-    align-items: start; /* Keeps cards looking neat even if descriptions are different lengths */
+    align-items: start;
   }
   .event-card {
     background: #ffffff;
@@ -56,8 +57,9 @@
     font-weight: 600;      
     color: #1e293b;
   }
-  .entry-name {
-    display: none;         
+  /* Hides the duplicate "Title" and "Start Date" from the main text block */
+  .entry-name, .entry-fromDate {
+    display: none !important;         
   }
   .feed-entry {
     display: block;
@@ -80,20 +82,17 @@
 
 <script>
   const rssUrl = 'https://sunderland.targetconnect.net/content/rss/allevents';
-  
-  // NEW: Swapped to a much more reliable proxy
   const proxyUrl = `https://corsproxy.io/?url=${encodeURIComponent(rssUrl)}`;
 
   fetch(proxyUrl)
     .then(response => {
       if (!response.ok) throw new Error('Network response was not ok');
-      return response.text(); // Get the raw XML text
+      return response.text(); 
     })
     .then(str => {
       const container = document.getElementById('event-feed-container');
       container.innerHTML = ''; 
       
-      // Parse the raw XML data manually
       const parser = new DOMParser();
       const xmlDoc = parser.parseFromString(str, "text/xml");
       const items = xmlDoc.querySelectorAll("item");
@@ -106,30 +105,29 @@
       // Loop through the first 6 items
       Array.from(items).slice(0, 6).forEach(item => {
         
-        // Extract the pieces we need
         const title = item.querySelector("title") ? item.querySelector("title").textContent : "Event";
         const link = item.querySelector("link") ? item.querySelector("link").textContent : "#";
-        
-        // Format date
-        const pubDateNode = item.querySelector("pubDate") ? item.querySelector("pubDate").textContent : null;
-        const pubDate = new Date(pubDateNode);
-        const dateString = pubDate.toLocaleDateString('en-GB', { 
-          weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' 
-        });
 
-        // Get the FULL description, uncut
         let rawDescription = item.querySelector("description") ? item.querySelector("description").textContent : "";
         
-        // Fallback check just in case the browser parses the XML differently
         if (!rawDescription.includes("<span") && item.querySelector("description") && item.querySelector("description").innerHTML.includes("<span")) {
             rawDescription = item.querySelector("description").innerHTML;
         }
 
-        // Build the HTML card
+        // Extract the Start Date out of the description for our pill
+        let actualStartDate = "";
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = rawDescription;
+        const startDateSpan = tempDiv.querySelector('.entry-fromDate .feed-entry-value');
+        if (startDateSpan) {
+            actualStartDate = startDateSpan.textContent.trim(); 
+        }
+
+        // Build the HTML card with the real date in the highlighted pill
         const card = `
           <a href="${link}" target="_blank" class="event-card">
             <h3 class="event-title">${title}</h3>
-            <span class="event-date">📅 Added: ${dateString}</span>
+            ${actualStartDate ? `<span class="event-date">📅 ${actualStartDate}</span>` : ''}
             <div class="event-desc">${rawDescription}</div>
           </a>
         `;
