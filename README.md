@@ -3,7 +3,7 @@
 This repository hosts custom-built, responsive frontend widgets designed to display live Employability & Enterprise events and vacancies. The HTML files are designed to be embedded seamlessly into University SharePoint and Canvas pages via iframes.
 
 ## Project Overview
-Instead of relying on restrictive third-party widget providers, these custom widgets pull live data directly from TargetConnect's public RSS feeds. They parse the raw XML, extract relevant hidden fields (such as "Closing Date" or "Employer"), dynamically sort the data, and render it into accessible, mobile-responsive UI cards and lists.
+These custom widgets pull live data directly from TargetConnect's public RSS feeds. They parse the raw XML, extract relevant hidden fields (such as "Closing Date" or "Employer"), dynamically sort the data, and render it into accessible, mobile-responsive UI cards and lists.
 
 ## How It Works
 * **Hosting:** Hosted securely on GitHub Pages as static files.
