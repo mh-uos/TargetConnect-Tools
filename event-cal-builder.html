@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Mike's Event Calendar Maker</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f4f4f9; margin: 0; padding: 0; }
+        
+        /* --- Tool Header --- */
+        .tool-header { background-color: #0069fa; background-image: url('https://cdn.groupgti.com/unlayer/ul8009g9t9i94007muadib91/1773744597981-Corner-Sparks-green.png'); background-position: right center; background-repeat: no-repeat; background-size: contain; color: #ffffff; padding: 20px 40px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .header-divider { height: 2px; background-color: #ffffff; width: 100%; max-width: 650px; margin: 10px 0; }
+        .badge { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; }
+
+        /* --- Layout --- */
+        .workspace { display: flex; gap: 30px; padding: 25px; max-width: 1600px; margin: 0 auto; align-items: flex-start; }
+        .panel-left { background: #ffffff; border-radius: 12px; padding: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); flex: 1; border: 1px solid #e2e8f0; }
+        .panel-right { background: #ffffff; border-radius: 12px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); flex: 1.5; border: 1px solid #e2e8f0; position: sticky; top: 25px; height: calc(100vh - 50px); display: flex; flex-direction: column; overflow-y: auto; }
+        
+        h2 { margin-top: 0; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
+        label { display: block; font-weight: 600; margin-top: 15px; margin-bottom: 5px; color: #334155; font-size: 0.85rem; text-transform: uppercase; }
+        input[type="text"], select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-family: inherit; }
+        
+        .color-group { display: flex; gap: 15px; }
+        .color-picker-wrapper { flex: 1; display: flex; align-items: center; gap: 10px; background: #f8fafc; border: 1px solid #cbd5e1; padding: 8px; border-radius: 6px; }
+        
+        /* Fix: Bulleted Instructions */
+        .instructions { background: #fffbeb; border: 1px solid #fef3c7; padding: 20px; border-radius: 8px; margin-bottom: 25px; color: #92400e; font-size: 0.9rem; }
+        .instructions b { color: #b45309; display: block; margin-bottom: 10px; font-size: 1rem; }
+        .instructions ul { margin: 0; padding-left: 20px; }
+        .instructions li { margin-bottom: 5px; font-weight: 500; }
+
+        #code-output { margin-top: 10px; background: #1e293b; color: #e2e8f0; font-family: monospace; padding: 15px; border-radius: 8px; height: 100px; font-size: 0.8rem; border: none; resize: none; width: 100%; box-sizing: border-box;}
+        .copy-btn { background: #0069fa; color: white; border: none; padding: 12px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; transition: background 0.2s; }
+        .copy-btn:hover { background: #0056cc; }
+
+        #preview-container { margin-top: 20px; flex-grow: 1; border: 1px dashed #cbd5e1; border-radius: 8px; background: #f1f5f9; min-height: 550px; overflow: hidden; position: relative; }
+        iframe { width: 100%; height: 100%; border: none; background: white; }
+    </style>
+</head>
+<body>
+
+    <header class="tool-header">
+        <div class="hero-content">
+            <h1>Event Calendar Maker</h1>
+            <div class="header-divider"></div>
+            <p>Generate a branded, interactive calendar that syncs with your TargetConnect Events RSS feed.</p>
+            <span class="badge">Universal Edition 1.0</span>
+        </div>
+    </header>
+
+    <div class="workspace">
+        <div class="panel-left">
+            <h2>⚙️ Style & Data</h2>
+            
+            <div class="instructions">
+                <b>🚨 Required TargetConnect Setup:</b>
+                In TargetConnect RSS settings, ensure 'Show field name' is checked for:
+                <ul>
+                    <li>Title</li>
+                    <li>Event Type</li>
+                    <li>Brief Description</li>
+                    <li>Location</li>
+                    <li>Closest Future Date</li>
+                    <li>End Date</li>
+                </ul>
+            </div>
+
+            <label>1. TargetConnect RSS Link</label>
+            <input type="text" id="rss-url" placeholder="Paste your RSS feed link here..." oninput="updateAll()">
+
+            <div class="color-group">
+                <div style="flex:1;">
+                    <label>2. Header Color</label>
+                    <div class="color-picker-wrapper">
+                        <input type="color" id="header-color" value="#0069fa" oninput="updateAll()">
+                    </div>
+                </div>
+                <div style="flex:1;">
+                    <label>3. Button Color</label>
+                    <div class="color-picker-wrapper">
+                        <input type="color" id="btn-color" value="#0069fa" oninput="updateAll()">
+                    </div>
+                </div>
+            </div>
+
+            <label>4. Button Text</label>
+            <input type="text" id="btn-text" value="Book on the Hub" oninput="updateAll()">
+
+            <label>5. Pop-up (Modal) Style</label>
+            <select id="modal-style" onchange="updateAll()">
+                <option value="modern">Modern (With Pills)</option>
+                <option value="professional">Professional (Clean Text)</option>
+            </select>
+
+            <h2 style="margin-top:40px;">💾 Save Code</h2>
+            <p style="font-size:0.85rem; color:#64748b;">Save this code as <b>index.html</b> using Notepad and host it via HTTPS.</p>
+            <textarea id="code-output" readonly></textarea>
+            <button class="copy-btn" onclick="copyCode()">📋 Copy Widget HTML Code</button>
+        </div>
+
+        <div class="panel-right">
+            <h2>👀 Live Visual Preview</h2>
+            <div id="preview-container">
+                <iframe id="preview-iframe"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Accessibility Helper: Checks if text should be white or dark based on background
+        function getContrast(hexconf) {
+            const hex = hexconf.replace('#', '');
+            const r = parseInt(hex.substr(0, 2), 16);
+            const g = parseInt(hex.substr(2, 2), 16);
+            const b = parseInt(hex.substr(4, 2), 16);
+            const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+            return (yiq >= 128) ? '#0f172a' : '#ffffff';
+        }
+
+        function generateWidgetHTML() {
+            const rss = document.getElementById('rss-url').value || 'https://sunderland.targetconnect.net/content/rss/allevents';
+            const theme = document.getElementById('header-color').value;
+            const btnColor = document.getElementById('btn-color').value;
+            const btnTxt = document.getElementById('btn-text').value;
+            const style = document.getElementById('modal-style').value;
+            
+            const headerText = getContrast(theme);
+            const btnTextCol = getContrast(btnColor);
+
+            return `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'><\/script>
+    <style>
+        body { font-family: -apple-system, system-ui, sans-serif; margin: 0; padding: 0; background: #fff; color: #1e293b; }
+        .custom-header { background: ${theme}; color: ${headerText}; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; border-radius: 8px 8px 0 0; }
+        .custom-header h1 { margin: 0; font-size: 1.5rem; font-weight: 800; }
+        .nav-btn { background: rgba(255,255,255,0.2); color: ${headerText}; border: 1px solid rgba(255,255,255,0.3); padding: 8px 15px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .fc-header-toolbar { display: none !important; }
+        .fc { border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 8px 8px; }
+        .fc-col-header-cell { background: #f8fafc; padding: 10px 0 !important; color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; }
+        .fc-daygrid-event { border: none !important; padding: 4px 8px !important; margin: 2px 4px !important; border-radius: 4px !important; font-weight: 600 !important; font-size: 0.8rem !important; background-color: ${theme} !important; color: ${headerText} !important; }
+        
+        .modal { display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background:rgba(15,23,42,0.7); backdrop-filter: blur(4px); }
+        .modal-content { background:#fff; margin:5% auto; padding:35px; width:90%; max-width:550px; border-radius:16px; position:relative; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); border: 1px solid #e2e8f0; }
+        .close { position:absolute; top:20px; right:20px; font-size:28px; cursor:pointer; color: #94a3b8; }
+        .modal-content h2 { margin: 0 0 20px 0; font-size: 1.8rem; font-weight: 800; color: #0f172a; line-height: 1.2; }
+        
+        .pill-row { display: ${style === 'modern' ? 'flex' : 'none'}; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .pill { padding: 6px 15px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; display: flex; align-items: center; gap: 6px; }
+        .pill-date { background: #fee2e2; color: #991b1b; }
+        .pill-loc { background: #ffedd5; color: #9a3412; }
+        
+        .meta-list { display: ${style === 'professional' ? 'block' : 'none'}; margin-bottom: 20px; font-size: 0.95rem; }
+        .meta-list p { margin: 5px 0; color: #64748b; }
+        .meta-list b { color: #0f172a; }
+
+        #m-desc { font-size: 1rem; color: #475569; line-height: 1.6; margin-bottom: 30px; }
+        .book-btn { display:block; text-align:center; background:${btnColor}; color:${btnTextCol}; padding:16px; text-decoration:none; border-radius:8px; font-weight:800; font-size: 1.1rem; transition: transform 0.1s; }
+    </style>
+</head>
+<body>
+    <div class="custom-header">
+        <button class="nav-btn" id="prevBtn">❮ Previous</button>
+        <h1 id="monthName"></h1>
+        <button class="nav-btn" id="nextBtn">Next ❯</button>
+    </div>
+    <div id='calendar'></div>
+
+    <div id="eventModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 id="m-title"></h2>
+            <div class="pill-row">
+                <div class="pill pill-date">📅 <span id="m-date-p"></span></div>
+                <div class="pill pill-loc">📍 <span id="m-loc-p"></span></div>
+            </div>
+            <div class="meta-list">
+                <p><b>Date:</b> <span id="m-date-s"></span></p>
+                <p><b>Location:</b> <span id="m-loc-s"></span></p>
+            </div>
+            <p id="m-desc"></p>
+            <a href="#" id="m-link" class="book-btn" target="_blank">${btnTxt}</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth', firstDay: 1,
+                datesSet: (dateInfo) => { document.getElementById('monthName').innerText = dateInfo.view.title; },
+                events: async function(info, successCallback, failureCallback) {
+                    try {
+                        const response = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent('${rss}'));
+                        const data = await response.json();
+                        const parser = new DOMParser();
+                        const xml = parser.parseFromString(data.contents, "text/xml");
+                        const items = xml.querySelectorAll("item");
+                        let events = Array.from(items).map(item => {
+                            const rawDesc = item.querySelector("description").textContent;
+                            const dDoc = new DOMParser().parseFromString(rawDesc, "text/html");
+                            const getF = (l) => { 
+                                const b = Array.from(dDoc.querySelectorAll('b')).find(x => x.textContent.includes(l));
+                                return b ? b.nextSibling.textContent.trim() : 'N/A';
+                            };
+                            return {
+                                title: item.querySelector("title").textContent,
+                                start: getF("Closest Future Date"),
+                                url: item.querySelector("link").textContent,
+                                extendedProps: { desc: getF("Brief Description"), loc: getF("Location") }
+                            };
+                        });
+                        successCallback(events);
+                    } catch (e) {
+                         successCallback([{ title: 'Demo: Paste RSS to Load', start: new Date(), extendedProps: { desc: 'Loading real data requires a live HTTPS server.', loc: 'Main Campus' } }]);
+                    }
+                },
+                eventClick: function(info) {
+                    info.jsEvent.preventDefault();
+                    document.getElementById('m-title').innerText = info.event.title;
+                    document.getElementById('m-date-p').innerText = info.event.start.toLocaleDateString();
+                    document.getElementById('m-date-s').innerText = info.event.start.toLocaleDateString();
+                    document.getElementById('m-loc-p').innerText = info.event.extendedProps.loc;
+                    document.getElementById('m-loc-s').innerText = info.event.extendedProps.loc;
+                    document.getElementById('m-desc').innerText = info.event.extendedProps.desc;
+                    document.getElementById('m-link').href = info.event.url;
+                    document.getElementById('eventModal').style.display = 'block';
+                }
+            });
+            calendar.render();
+            document.getElementById('prevBtn').addEventListener('click', () => calendar.prev());
+            document.getElementById('nextBtn').addEventListener('click', () => calendar.next());
+        });
+        function closeModal() { document.getElementById('eventModal').style.display = 'none'; }
+    <\/script>
+</body>
+</html>`;
+        }
+
+        function updateAll() {
+            const html = generateWidgetHTML();
+            document.getElementById('code-output').value = html;
+            const iframe = document.getElementById('preview-iframe');
+            iframe.srcdoc = html;
+        }
+
+        function copyCode() {
+            const copyText = document.getElementById("code-output");
+            copyText.select();
+            document.execCommand("copy");
+            alert("Widget Code Copied!");
+        }
+        
+        updateAll();
+    </script>
+</body>
+</html>
