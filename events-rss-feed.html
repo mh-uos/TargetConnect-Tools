@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sunderland Events Feed</title>
+    <title>Sunderland Events Feed - Horizontal</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -12,13 +12,36 @@
             padding: 40px 20px;
         }
 
-        /* --- Grid Layout --- */
-        .events-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 25px;
+        /* --- Horizontal Scrolling Container --- */
+        .feed-wrapper {
             max-width: 1200px;
             margin: 0 auto;
+            overflow-x: auto;
+            padding-bottom: 20px; 
+            -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
+        }
+
+        /* Custom Scrollbar Styling */
+        .feed-wrapper::-webkit-scrollbar {
+            height: 8px;
+        }
+        .feed-wrapper::-webkit-scrollbar-track {
+            background: #e2e8f0; 
+            border-radius: 10px;
+        }
+        .feed-wrapper::-webkit-scrollbar-thumb {
+            background: #94a3b8; 
+            border-radius: 10px;
+        }
+        .feed-wrapper::-webkit-scrollbar-thumb:hover {
+            background: #64748b; 
+        }
+
+        .events-track {
+            display: flex;
+            gap: 25px;
+            flex-wrap: nowrap; 
         }
 
         /* --- Event Card --- */
@@ -26,7 +49,7 @@
             background: #ffffff;
             border-radius: 8px;
             border: 1px solid #e2e8f0;
-            border-left: 6px solid #0069fa; /* Sunderland Blue Accent */
+            border-left: 6px solid #0069fa; 
             padding: 20px;
             text-decoration: none;
             display: flex;
@@ -34,6 +57,10 @@
             gap: 15px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.04);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
+            
+            min-width: 320px;
+            max-width: 320px;
+            flex-shrink: 0;
         }
 
         .event-card:hover {
@@ -49,7 +76,6 @@
             align-items: flex-start;
         }
 
-        /* Calendar Date Icon */
         .date-icon {
             width: 55px;
             flex-shrink: 0;
@@ -76,7 +102,6 @@
             padding: 6px 0;
         }
 
-        /* Title */
         .event-title {
             margin: 0;
             font-size: 1.15rem;
@@ -102,14 +127,8 @@
             gap: 6px;
         }
         
-        .pill-time {
-            background: #fee2e2;
-            color: #b91c1c;
-        }
-        .pill-loc {
-            background: #ffedd5;
-            color: #c2410c;
-        }
+        .pill-time { background: #fee2e2; color: #b91c1c; }
+        .pill-loc { background: #ffedd5; color: #c2410c; }
 
         /* --- Description --- */
         .event-desc {
@@ -117,7 +136,6 @@
             font-size: 0.95rem;
             line-height: 1.5;
             margin: 0;
-            /* Truncate text after 3 lines */
             display: -webkit-box;
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
@@ -129,15 +147,18 @@
             text-align: center;
             color: #64748b;
             font-size: 1.1rem;
-            grid-column: 1 / -1;
+            width: 100%;
             padding: 40px;
+            font-style: italic;
         }
     </style>
 </head>
 <body>
 
-    <div class="events-grid" id="events-grid">
-        <div class="loading">Loading live events...</div>
+    <div class="feed-wrapper">
+        <div class="events-track" id="events-track">
+            <div class="loading">Fetching live events...</div>
+        </div>
     </div>
 
     <script>
@@ -161,24 +182,49 @@
         }
 
         function renderEvents(items) {
-            const grid = document.getElementById('events-grid');
-            grid.innerHTML = ''; // Clear loading
+            const track = document.getElementById('events-track');
+            track.innerHTML = ''; 
 
             items.forEach(item => {
-                // Parse TargetConnect HTML Description
                 const dDoc = new DOMParser().parseFromString(item.description, "text/html");
                 
-                // Helper to extract fields based on bold labels
-                const getField = (label) => {
-                    const bTag = Array.from(dDoc.querySelectorAll('b')).find(x => x.textContent.includes(label));
-                    return bTag ? bTag.nextSibling.textContent.trim() : null;
-                };
+                let location = "Sunderland Campus";
+                let briefDesc = "";
 
-                // Extract TargetConnect Data
-                const location = getField("Location") || "Sunderland Campus";
-                const briefDesc = getField("Brief Description") || dDoc.body.textContent.trim().substring(0, 150) + "...";
+                // TargetConnect Specific HTML Parsing
+                const labels = dDoc.querySelectorAll('.feed-entry-label');
+                labels.forEach(label => {
+                    const txt = label.textContent.toLowerCase();
+                    const parent = label.parentElement;
+                    const valNode = parent.querySelector('.feed-entry-value');
+
+                    if (txt.includes('location')) {
+                        location = valNode ? valNode.textContent.trim() : "Online / Campus";
+                    }
+                    
+                    if (txt.includes('brief description')) {
+                        if (valNode) {
+                            briefDesc = valNode.textContent.trim();
+                        } else {
+                            label.remove(); // Remove the "Brief Description:" text
+                            briefDesc = parent.textContent.trim();
+                        }
+                        // Explicitly strip out leading colons and spaces
+                        briefDesc = briefDesc.replace(/^:\s*/, '').trim();
+                    }
+                });
+
+                // Extra safety check: if a colon still somehow snuck through at the very start
+                if (briefDesc.startsWith(':')) {
+                    briefDesc = briefDesc.substring(1).trim();
+                }
+
+                // If description is empty, provide a fallback message
+                if (!briefDesc) {
+                    briefDesc = "Click to view full event details and booking information.";
+                }
                 
-                // Find the Date string (TargetConnect format: "13-Apr-2026 at 13:00 - 15:00")
+                // Find the Date string
                 const dateSpan = dDoc.querySelector('.entry-dynamicstrings_days .feed-entry-value');
                 const rawDateStr = dateSpan ? dateSpan.textContent.trim() : null;
                 
@@ -187,18 +233,17 @@
                 let displayTime = "Time TBC";
 
                 if (rawDateStr) {
-                    // Split the string at " at " to separate Date and Time
-                    const dateParts = rawDateStr.split(' at ');
+                    const cleanDateStr = rawDateStr.replace(' at ', ' ');
+                    const dateParts = cleanDateStr.split(' ');
                     const dateObj = new Date(dateParts[0]);
 
                     if (!isNaN(dateObj.getTime())) {
                         displayMonth = dateObj.toLocaleString('en-GB', { month: 'short' }).toUpperCase();
                         displayDay = dateObj.getDate();
-                        displayTime = dateParts[1] ? dateParts[1].trim() : "All Day";
+                        displayTime = dateParts.slice(1).join(' ').trim() || "All Day";
                     }
                 }
 
-                // Build the Card HTML
                 const card = document.createElement('a');
                 card.href = item.link;
                 card.target = "_blank";
@@ -221,15 +266,14 @@
                     <p class="event-desc">${briefDesc}</p>
                 `;
 
-                grid.appendChild(card);
+                track.appendChild(card);
             });
         }
 
         function showError() {
-            document.getElementById('events-grid').innerHTML = '<div class="loading" style="color: #ef4444;">Unable to load events at this time.</div>';
+            document.getElementById('events-track').innerHTML = '<div class="loading" style="color: #ef4444;">Unable to load events at this time. Please check your RSS feed.</div>';
         }
 
-        // Initialize
         fetchEvents();
     </script>
 
