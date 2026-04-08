@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Mike's Amazing Custom Pane Maker</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f4f9; margin: 0; padding: 0;
+            display: flex; flex-direction: column; height: 100vh; box-sizing: border-box;
+        }
+        
+        /* --- Official Tool Banner --- */
+        .tool-header {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            color: #ffffff; padding: 20px 40px;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 10;
+        }
+        .tool-header h1 { margin: 0; font-size: 1.8rem; font-weight: 800; letter-spacing: -0.5px; }
+        .tool-header p { margin: 5px 0 0 0; color: #94a3b8; font-size: 0.95rem; }
+        .badge { background: #3b82f6; color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; }
+
+        /* --- Main Layout --- */
+        .workspace {
+            display: flex; gap: 30px; padding: 25px; flex-grow: 1; overflow: hidden;
+        }
+        .panel {
+            background: #ffffff; border-radius: 12px; padding: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); flex: 1;
+            overflow-y: auto; display: flex; flex-direction: column; border: 1px solid #e2e8f0;
+        }
+        
+        h2 { margin-top: 0; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
+        h3 { color: #3b82f6; margin-bottom: 5px; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px; font-size: 1.1rem; }
+        label { display: block; font-weight: 600; margin-top: 15px; margin-bottom: 5px; color: #334155; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;}
+        
+        input[type="text"], textarea, select {
+            width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-family: inherit; box-sizing: border-box; font-size: 0.95rem;
+        }
+        
+        /* Color Pickers Layout */
+        .color-group { display: flex; gap: 15px; align-items: center; margin-top: 5px; }
+        .color-picker-wrapper { display: flex; align-items: center; gap: 8px; background: #f8fafc; border: 1px solid #cbd5e1; padding: 4px 10px; border-radius: 6px;}
+        input[type="color"] { border: none; width: 30px; height: 30px; padding: 0; background: none; cursor: pointer; }
+        
+        .segment-card {
+            background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 20px; margin-bottom: 25px; position: relative;
+        }
+        .remove-btn {
+            position: absolute; top: 15px; right: 15px; background: #fee2e2; color: #991b1b;
+            border: none; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold;
+        }
+        .add-segment-btn {
+            background: #f1f5f9; color: #0f172a; border: 2px dashed #94a3b8; padding: 15px;
+            border-radius: 8px; font-weight: bold; cursor: pointer; text-align: center; margin-bottom: 25px; transition: all 0.2s;
+        }
+        .add-segment-btn:hover { background: #e2e8f0; border-color: #64748b; }
+        
+        .row { display: flex; gap: 15px; }
+        .col { flex: 1; }
+        
+        .preview-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 20px;}
+        .copy-btn { background: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.95rem; transition: background 0.2s;}
+        .copy-btn:hover { background: #2563eb; }
+        #code-output { margin-top: 20px; background: #1e293b; color: #e2e8f0; font-family: monospace; padding: 15px; border-radius: 8px; min-height: 250px; font-size: 0.85rem; border: none; resize: vertical;}
+        
+        .hint { font-size: 0.8rem; color: #64748b; margin-top: 2px; }
+    </style>
+</head>
+<body>
+
+    <header class="tool-header">
+        <div>
+            <h1>Mike's Amazing Custom Pane Maker</h1>
+            <p>Generate responsive, targeted banners for TargetConnect using Velocity logic.</p>
+        </div>
+        <div>
+            <span class="badge">Universal Edition v1.0</span>
+        </div>
+    </header>
+
+    <div class="workspace">
+        <div class="panel">
+            <h2>🛠️ Rule Builder</h2>
+            
+            <div id="segments-container"></div>
+            
+            <button class="add-segment-btn" onclick="addSegment()">➕ Add Another Audience Segment</button>
+
+            <div class="segment-card" style="border-color: #94a3b8; background: #f8fafc;">
+                <h3 style="color: #475569; border-color: #cbd5e1;">The Fallback (Default Banner)</h3>
+                <p style="font-size: 0.85rem; color: #64748b; margin: 0 0 15px 0;">What should users see if they don't match any tags above? Leave headline blank to show nothing.</p>
+                
+                <div class="row">
+                    <div class="col">
+                        <label>Template Style</label>
+                        <select id="fallback-template" onchange="generateCode()">
+                            <option value="solid">Solid Color Block</option>
+                            <option value="gradient">Smooth Gradient</option>
+                            <option value="minimal">Minimal Outlined</option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label>Colors</label>
+                        <div class="color-group">
+                            <div class="color-picker-wrapper" title="Background / Primary Color"><input type="color" id="fallback-color1" value="#0f172a" oninput="generateCode()"> BG</div>
+                            <div class="color-picker-wrapper" title="Gradient Secondary Color"><input type="color" id="fallback-color2" value="#3b82f6" oninput="generateCode()"> Grad</div>
+                            <div class="color-picker-wrapper" title="Text Color"><input type="color" id="fallback-text-color" value="#ffffff" oninput="generateCode()"> Txt</div>
+                        </div>
+                    </div>
+                </div>
+
+                <label>Headline</label>
+                <input type="text" id="fallback-title" placeholder="e.g., Welcome to the Careers Hub" oninput="generateCode()">
+                
+                <label>Text</label>
+                <textarea id="fallback-text" rows="2" placeholder="Contact our team for personalised support." oninput="generateCode()"></textarea>
+
+                <div class="row">
+                    <div class="col">
+                        <label>Button (Text | URL)</label>
+                        <input type="text" id="fallback-b1-txt" placeholder="e.g., Book Appointment" oninput="generateCode()">
+                        <input type="text" id="fallback-b1-url" placeholder="e.g., /appointments" style="margin-top:5px;" oninput="generateCode()">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="preview-header">
+                <h2 style="border:none; margin:0;">👀 Live Preview</h2>
+                <button class="copy-btn" onclick="copyVelocityCode()">📋 Copy Velocity Code</button>
+            </div>
+            
+            <div id="live-preview" style="flex-grow: 1; border: 1px dashed #cbd5e1; padding: 20px; border-radius: 8px; background: #f8fafc; overflow-y: auto; max-height: 50vh;"></div>
+
+            <label style="margin-top:20px;">Generated Code (Paste into TargetConnect HTML Editor)</label>
+            <textarea id="code-output" readonly></textarea>
+        </div>
+    </div>
+
+    <script>
+        let segmentCount = 0;
+
+        // Adds a new configuration block
+        function addSegment(presetTags = "", title = "", text = "", tpl = "solid", c1 = "#2563eb", c2 = "#4f46e5", txtC = "#ffffff") {
+            segmentCount++;
+            const id = segmentCount;
+            
+            const html = `
+            <div class="segment-card" id="segment-${id}">
+                ${id > 1 ? `<button class="remove-btn" onclick="removeSegment(${id})">Remove</button>` : ''}
+                <h3>Segment ${id}</h3>
+                
+                <label>Target Tags (Comma separated)</label>
+                <div class="hint">e.g. <code>Business School, Final Year</code> (User must have ALL tags typed here)</div>
+                <input type="text" id="seg-${id}-tags" value="${presetTags}" placeholder="e.g., Alumni, London Campus" oninput="generateCode()">
+
+                <div class="row" style="margin-top: 15px;">
+                    <div class="col">
+                        <label>Template Style</label>
+                        <select id="seg-${id}-template" onchange="generateCode()">
+                            <option value="solid" ${tpl === 'solid' ? 'selected' : ''}>Solid Color Block</option>
+                            <option value="gradient" ${tpl === 'gradient' ? 'selected' : ''}>Smooth Gradient</option>
+                            <option value="minimal" ${tpl === 'minimal' ? 'selected' : ''}>Minimal Outlined</option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label>Colors</label>
+                        <div class="color-group">
+                            <div class="color-picker-wrapper" title="Background / Primary Color">
+                                <input type="color" id="seg-${id}-color1" value="${c1}" oninput="generateCode()"> BG
+                            </div>
+                            <div class="color-picker-wrapper" title="Gradient Secondary Color">
+                                <input type="color" id="seg-${id}-color2" value="${c2}" oninput="generateCode()"> Grad
+                            </div>
+                            <div class="color-picker-wrapper" title="Text Color">
+                                <input type="color" id="seg-${id}-text-color" value="${txtC}" oninput="generateCode()"> Txt
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <label>Headline</label>
+                <input type="text" id="seg-${id}-title" value="${title}" placeholder="e.g., Exclusive Alumni Events" oninput="generateCode()">
+                
+                <label>Text</label>
+                <textarea id="seg-${id}-text" rows="2" placeholder="Book your sessions below..." oninput="generateCode()">${text}</textarea>
+
+                <div class="row">
+                    <div class="col">
+                        <label>Button 1 (Text | URL)</label>
+                        <input type="text" id="seg-${id}-b1-txt" placeholder="e.g., View Events" oninput="generateCode()">
+                        <input type="text" id="seg-${id}-b1-url" placeholder="e.g., /events.html" style="margin-top:5px;" oninput="generateCode()">
+                    </div>
+                    <div class="col">
+                        <label>Button 2 (Text | URL)</label>
+                        <input type="text" id="seg-${id}-b2-txt" placeholder="Optional" oninput="generateCode()">
+                        <input type="text" id="seg-${id}-b2-url" placeholder="Optional" style="margin-top:5px;" oninput="generateCode()">
+                    </div>
+                </div>
+            </div>`;
+            
+            document.getElementById('segments-container').insertAdjacentHTML('beforeend', html);
+            generateCode();
+        }
+
+        function removeSegment(id) {
+            document.getElementById(`segment-${id}`).remove();
+            generateCode();
+        }
+
+        // Creates a safe variable name for Velocity (removes spaces/special chars)
+        function safeVarName(tag) {
+            return "has_" + tag.trim().replace(/[^a-zA-Z0-9]/g, '');
+        }
+
+        // Builds the pure inline HTML based on the chosen template
+        function buildBannerHTML(title, text, template, c1, c2, txtColor, buttons) {
+            if(!title) return '';
+            
+            // Generate Buttons
+            let buttonsHtml = '';
+            if (buttons.length > 0) {
+                const btns = buttons.map(b => {
+                    // Button styling adapts to template
+                    let btnStyle = `background: ${txtColor}; color: ${c1};`; // Default Solid/Grad
+                    if (template === 'minimal') {
+                        btnStyle = `background: ${c1}; color: #ffffff;`;
+                    }
+                    return `<a href="${b.url}" style="flex: 1; text-align: center; padding: 12px 20px; border-radius: 6px; font-weight: bold; text-decoration: none; font-size: 0.95rem; display: block; white-space: nowrap; ${btnStyle}">${b.txt}</a>`;
+                }).join('');
+                buttonsHtml = `<div style="display: flex; gap: 15px; margin-top: 20px; width: 100%; flex-wrap: wrap;">${btns}</div>`;
+            }
+
+            // Generate Container Style
+            let containerStyle = '';
+            if (template === 'solid') {
+                containerStyle = `background-color: ${c1}; color: ${txtColor}; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);`;
+            } else if (template === 'gradient') {
+                containerStyle = `background: linear-gradient(135deg, ${c1}, ${c2}); color: ${txtColor}; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);`;
+            } else if (template === 'minimal') {
+                containerStyle = `background-color: #ffffff; color: ${txtColor}; padding: 28px; border-radius: 12px; border: 3px solid ${c1}; box-shadow: 0 4px 15px rgba(0,0,0,0.05);`;
+            }
+
+            // Return the locked-in inline HTML
+            return `
+<div style="margin-bottom: 25px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+  <div style="${containerStyle}">
+    <h2 style="font-size: 1.8rem; font-weight: 800; margin: 0 0 10px 0; line-height: 1.2; color: inherit;">${title}</h2>
+    <p style="font-size: 1rem; margin: 0; color: inherit; opacity: 0.9; line-height: 1.5;">${text.replace(/\n/g, '<br>')}</p>
+    ${buttonsHtml}
+  </div>
+</div>`;
+        }
+
+        // The master function that generates both Preview and Code
+        function generateCode() {
+            let previewHTML = '';
+            let velocityCode = '';
+            let allUsedTags = new Set();
+            let segmentLogics = [];
+
+            // Process user-created segments
+            const cards = document.querySelectorAll('.segment-card[id^="segment-"]');
+            cards.forEach(card => {
+                const id = card.id.split('-')[1];
+                
+                // Parse comma-separated tags
+                const rawTags = document.getElementById(`seg-${id}-tags`).value;
+                const checkedTags = rawTags.split(',').map(t => t.trim()).filter(t => t);
+                checkedTags.forEach(t => allUsedTags.add(t));
+
+                const title = document.getElementById(`seg-${id}-title`).value;
+                const text = document.getElementById(`seg-${id}-text`).value;
+                const tpl = document.getElementById(`seg-${id}-template`).value;
+                const c1 = document.getElementById(`seg-${id}-color1`).value;
+                const c2 = document.getElementById(`seg-${id}-color2`).value;
+                const txtC = document.getElementById(`seg-${id}-text-color`).value;
+                
+                let btns = [];
+                for(let i=1; i<=2; i++) {
+                    let btnTxt = document.getElementById(`seg-${id}-b${i}-txt`).value;
+                    let btnUrl = document.getElementById(`seg-${id}-b${i}-url`).value;
+                    if(btnTxt && btnUrl) btns.push({txt: btnTxt, url: btnUrl});
+                }
+
+                if (checkedTags.length > 0 && title) {
+                    const bannerHtml = buildBannerHTML(title, text, tpl, c1, c2, txtC, btns);
+                    
+                    previewHTML += `<div style="margin-bottom:40px;"><div style="background:#e2e8f0; padding:6px 12px; font-size:0.8rem; font-weight:bold; display:inline-block; border-radius:4px; margin-bottom:15px; color:#334155;">IF TAGS: ${checkedTags.join(' AND ')}</div>${bannerHtml}</div>`;
+                    
+                    const conditionStr = checkedTags.map(t => `$${safeVarName(t)}`).join(' && ');
+                    segmentLogics.push({ condition: conditionStr, html: bannerHtml });
+                }
+            });
+
+            // Process Fallback
+            const fallTitle = document.getElementById('fallback-title').value;
+            let fallHtml = '';
+            if (fallTitle) {
+                const fallText = document.getElementById('fallback-text').value;
+                const fTpl = document.getElementById('fallback-template').value;
+                const fC1 = document.getElementById('fallback-color1').value;
+                const fC2 = document.getElementById('fallback-color2').value;
+                const fTxtC = document.getElementById('fallback-text-color').value;
+                
+                let fBtnTxt = document.getElementById('fallback-b1-txt').value;
+                let fBtnUrl = document.getElementById('fallback-b1-url').value;
+                let fallBtns = (fBtnTxt && fBtnUrl) ? [{txt: fBtnTxt, url: fBtnUrl}] : [];
+                
+                fallHtml = buildBannerHTML(fallTitle, fallText, fTpl, fC1, fC2, fTxtC, fallBtns);
+                previewHTML += `<div style="margin-bottom:40px;"><div style="background:#fef08a; padding:6px 12px; font-size:0.8rem; font-weight:bold; display:inline-block; border-radius:4px; margin-bottom:15px; color:#854d0e;">ELSE (Fallback):</div>${fallHtml}</div>`;
+            }
+
+            document.getElementById('live-preview').innerHTML = previewHTML || '<p style="color:#94a3b8; font-style:italic;">Fill out a segment to see the preview...</p>';
+
+            // BUILD VELOCITY CODE
+            if (segmentLogics.length === 0) {
+                document.getElementById('code-output').value = "Please configure at least one segment with tags and a title.";
+                return;
+            }
+
+            let vCode = "\n";
+            allUsedTags.forEach(tag => {
+                vCode += `#set($${safeVarName(tag)} = false)\n`;
+            });
+
+            vCode += `\n\n#foreach($tag in $user.Tags)\n`;
+            Array.from(allUsedTags).forEach((tag, index) => {
+                const statement = index === 0 ? "#if" : "#elseif";
+                // Uses String.toLowerCase() logic to ensure case-insensitivity just in case!
+                vCode += `  ${statement}($tag.toLowerCase() == '${tag.toLowerCase()}')\n    #set($${safeVarName(tag)} = true)\n`;
+            });
+            vCode += `#end\n\n\n<div class="custom-pane-container">\n\n`;
+
+            segmentLogics.forEach((seg, idx) => {
+                const statement = idx === 0 ? "#if" : "#elseif";
+                vCode += `${statement}(${seg.condition})\n${seg.html}\n\n`;
+            });
+
+            if (fallHtml) {
+                vCode += `#else\n${fallHtml}\n\n`;
+            }
+
+            vCode += `#end\n</div>`;
+            document.getElementById('code-output').value = vCode;
+        }
+
+        function copyVelocityCode() {
+            const codeBox = document.getElementById('code-output');
+            codeBox.select();
+            document.execCommand('copy');
+            alert('Velocity Logic Copied! Ready for TargetConnect.');
+        }
+
+        // Initialize with a demo setup to show off the gradient feature
+        addSegment("Final Year, International", "Global Graduate Opportunities", "Explore roles designed specifically for international students completing their studies.", "gradient", "#0f172a", "#3b82f6", "#ffffff");
+        
+    </script>
+</body>
+</html>
