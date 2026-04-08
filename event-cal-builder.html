@@ -2,14 +2,25 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Mike's Event Calendar Maker</title>
+    <title>Event Calendar Maker</title>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f4f4f9; margin: 0; padding: 0; }
         
-        .tool-header { background-color: #0069fa; background-image: url('https://cdn.groupgti.com/unlayer/ul8009g9t9i94007muadib91/1773744597981-Corner-Sparks-green.png'); background-position: right center; background-repeat: no-repeat; background-size: contain; color: #ffffff; padding: 20px 40px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        /* --- Tool Header --- */
+        .tool-header { 
+            background-color: #0069fa; 
+            background-image: url('https://cdn.groupgti.com/unlayer/ul8009g9t9i94007muadib91/1773744597981-Corner-Sparks-green.png'); 
+            background-position: right center; 
+            background-repeat: no-repeat; 
+            background-size: contain; 
+            color: #ffffff; 
+            padding: 20px 40px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+        }
         .header-divider { height: 2px; background-color: #ffffff; width: 100%; max-width: 650px; margin: 10px 0; }
         .badge { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; }
 
+        /* --- Layout --- */
         .workspace { display: flex; gap: 30px; padding: 25px; max-width: 1600px; margin: 0 auto; align-items: flex-start; }
         .panel-left { background: #ffffff; border-radius: 12px; padding: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); flex: 1; border: 1px solid #e2e8f0; }
         .panel-right { background: #ffffff; border-radius: 12px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); flex: 1.5; border: 1px solid #e2e8f0; position: sticky; top: 25px; height: calc(100vh - 50px); display: flex; flex-direction: column; overflow-y: auto; }
@@ -21,13 +32,18 @@
         .color-group { display: flex; gap: 15px; }
         .color-picker-wrapper { flex: 1; display: flex; align-items: center; gap: 10px; background: #f8fafc; border: 1px solid #cbd5e1; padding: 8px; border-radius: 6px; }
         
+        /* Bulleted Instructions */
         .instructions { background: #fffbeb; border: 1px solid #fef3c7; padding: 20px; border-radius: 8px; margin-bottom: 25px; color: #92400e; font-size: 0.9rem; }
         .instructions b { color: #b45309; display: block; margin-bottom: 10px; font-size: 1rem; }
         .instructions ul { margin: 0; padding-left: 20px; }
         .instructions li { margin-bottom: 5px; font-weight: 500; }
 
-        #code-output { margin-top: 10px; background: #1e293b; color: #e2e8f0; font-family: monospace; padding: 15px; border-radius: 8px; height: 120px; font-size: 0.8rem; border: none; resize: none; width: 100%; box-sizing: border-box;}
-        .copy-btn { background: #0069fa; color: white; border: none; padding: 12px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
+        .hosting-guide { background: #f1f5f9; border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; margin-top: 25px; font-size: 0.85rem; color: #475569; }
+        .hosting-guide h3 { margin-top: 0; font-size: 1rem; color: #1e293b; }
+
+        #code-output { margin-top: 10px; background: #1e293b; color: #e2e8f0; font-family: monospace; padding: 15px; border-radius: 8px; height: 100px; font-size: 0.8rem; border: none; resize: none; width: 100%; box-sizing: border-box;}
+        .copy-btn { background: #0069fa; color: white; border: none; padding: 12px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; transition: background 0.2s; }
+        .copy-btn:hover { background: #0056cc; }
 
         #preview-container { margin-top: 20px; flex-grow: 1; border: 1px dashed #cbd5e1; border-radius: 8px; background: #f1f5f9; min-height: 550px; overflow: hidden; position: relative; }
         iframe { width: 100%; height: 100%; border: none; background: white; }
@@ -62,7 +78,7 @@
             </div>
 
             <label>1. TargetConnect RSS Link</label>
-            <input type="text" id="rss-url" placeholder="Paste your RSS feed link here..." oninput="updateAll()">
+            <input type="text" id="rss-url" placeholder="https://yourlink.targetconnect.net/rss/..." oninput="updateAll()">
 
             <div class="color-group">
                 <div style="flex:1;">
@@ -88,10 +104,13 @@
                 <option value="professional">Professional (Clean Text)</option>
             </select>
 
-            <h2 style="margin-top:40px;">💾 Save Code</h2>
-            <p style="font-size:0.85rem; color:#64748b;">Save this code as <b>index.html</b> and host it on GitHub Pages.</p>
-            <textarea id="code-output" readonly></textarea>
-            <button class="copy-btn" onclick="copyCode()">📋 Copy Widget HTML Code</button>
+            <div class="hosting-guide">
+                <h3>💾 Save & Host Instructions</h3>
+                <p>1. Copy the code from the right panel.<br>
+                2. Open <b>Notepad</b> or <b>TextEdit</b>, paste the code, and save as <b>index.html</b>.<br>
+                3. This file <u>must</u> be hosted on a secure web server (HTTPS) or GitHub Pages to work.<br><br>
+                <b>Security:</b> Your IT team is usually the best point of contact for hosting. If you need help, contact <a href="mailto:mike.henson@sunderland.ac.uk">Mike Henson</a>.</p>
+            </div>
         </div>
 
         <div class="panel-right">
@@ -99,6 +118,10 @@
             <div id="preview-container">
                 <iframe id="preview-iframe"></iframe>
             </div>
+            
+            <label style="margin-top:20px;">Widget HTML Code</label>
+            <textarea id="code-output" readonly></textarea>
+            <button class="copy-btn" onclick="copyCode()">📋 Copy Widget HTML Code</button>
         </div>
     </div>
 
@@ -109,11 +132,11 @@
             const g = parseInt(hex.substr(2, 2), 16);
             const b = parseInt(hex.substr(4, 2), 16);
             const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
-            return (yiq >= 128) ? '#0f172a' : '#ffffff';
+            return (yiq >= 128) ? '#1e293b' : '#ffffff';
         }
 
         function generateWidgetHTML() {
-            const rss = document.getElementById('rss-url').value || 'https://sunderland.targetconnect.net/content/rss/allevents';
+            const rssLink = document.getElementById('rss-url').value;
             const theme = document.getElementById('header-color').value;
             const btnColor = document.getElementById('btn-color').value;
             const btnTxt = document.getElementById('btn-text').value;
@@ -122,7 +145,6 @@
             const headerText = getContrast(theme);
             const btnTextCol = getContrast(btnColor);
 
-            // This template uses the USER'S WORKING LOGIC merged with our CUSTOMIZATIONS
             return `<!DOCTYPE html>
 <html>
 <head>
@@ -180,13 +202,23 @@
       const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
       async function fetchEvents() {
-        const api = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent('${rss}') + '&api_key=your_api_key_here';
+        const rssInput = '${rssLink}';
+        if(!rssInput) {
+            document.getElementById('calendar-grid').innerHTML = '<div style="grid-column: 1 / -1; padding: 40px; text-align: center; color: #64748b; font-style: italic;">Enter your RSS URL in the builder to see your events.</div>';
+            document.getElementById('month-display').textContent = monthNames[currentMonth] + " " + currentYear;
+            return;
+        }
+        
+        const api = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(rssInput);
         try {
           const response = await fetch(api);
           const data = await response.json();
           if (data && data.items) parseEvents(data.items);
           renderCalendar();
-        } catch (e) { console.error(e); }
+        } catch (e) { 
+            console.error(e);
+            document.getElementById('calendar-grid').innerHTML = '<div style="grid-column: 1 / -1; padding: 40px; text-align: center; color: #ef4444;">Error fetching data. Check your RSS URL or hosting.</div>';
+        }
       }
 
       function parseEvents(items) {
@@ -213,6 +245,7 @@
                 if (txt.includes('event type') || txt.includes('end date') || txt.includes('closest future date')) {
                     label.parentElement.remove();
                 }
+                if (txt.includes('brief description')) label.remove();
               });
               
               eventsMap[dateKey].push({
@@ -245,13 +278,13 @@
         for (let day = 1; day <= daysInMonth; day++) {
           const cell = document.createElement('div'); cell.className = 'calendar-cell';
           const num = document.createElement('div'); num.className = 'date-number'; num.textContent = day;
-          if (new Date().getDate() === day && new Date().getMonth() === currentMonth) num.classList.add('today');
+          if (new Date().getDate() === day && new Date().getMonth() === currentMonth && new Date().getFullYear() === currentYear) num.classList.add('today');
           cell.appendChild(num);
 
           const evs = eventsMap[\`\${currentYear}-\${currentMonth}-\${day}\`];
           if (evs) evs.forEach((e, idx) => {
             const b = document.createElement('div'); b.className = 'event-block';
-            b.innerHTML = \`<span class="event-time">\${e.time}</span> \${e.title}\`;
+            b.innerHTML = \`<span style="font-weight:bold;">\${e.time}</span> \${e.title}\`;
             b.onclick = () => openModal(\`\${currentYear}-\${currentMonth}-\${day}\`, idx);
             cell.appendChild(b);
           });
@@ -269,11 +302,17 @@
             <div class="meta-simple"><b>Location:</b> \${e.location}</div>\`;
         document.getElementById('modal-btn').href = e.link;
         document.getElementById('event-modal').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
       }
 
-      function closeModal() { document.getElementById('event-modal').style.display = 'none'; }
+      function closeModal() { 
+          document.getElementById('event-modal').style.display = 'none'; 
+          document.body.style.overflow = 'auto';
+      }
+      
       document.getElementById('prev-month').onclick = () => { currentMonth--; if(currentMonth<0){currentMonth=11;currentYear--;} renderCalendar(); };
       document.getElementById('next-month').onclick = () => { currentMonth++; if(currentMonth>11){currentMonth=0;currentYear++;} renderCalendar(); };
+      
       fetchEvents();
     <\/script>
 </body>
@@ -291,7 +330,7 @@
             const copyText = document.getElementById("code-output");
             copyText.select();
             document.execCommand("copy");
-            alert("Bulletproof Widget Code Copied!");
+            alert("Custom Widget Code Copied!");
         }
         
         updateAll();
