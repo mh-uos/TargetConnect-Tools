@@ -3,47 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TargetConnect Community Tools</title>
+    <title>TargetConnect Community Tools | Built by Mike Henson</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f8fafc;
+            background-color: #f4f4f9;
             margin: 0;
             padding: 0;
             color: #334155;
             line-height: 1.6;
         }
 
-        /* --- Hero Header --- */
+        /* --- True Sunderland Style Hero Banner --- */
         .hero {
-            background: linear-gradient(135deg, #1e293b, #0f172a);
+            background-color: #0069fa; 
+            background-image: url('https://cdn.groupgti.com/unlayer/ul8009g9t9i94007muadib91/1773744597981-Corner-Sparks-green.png');
+            background-position: right center;
+            background-repeat: no-repeat;
+            background-size: contain;
             color: #ffffff;
-            padding: 60px 20px;
-            text-align: center;
-            border-bottom: 4px solid #3b82f6;
+            padding: 50px 40px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .hero-content {
+            max-width: 900px;
+            margin: 0 auto;
         }
         .hero h1 {
             margin: 0;
             font-size: 2.5rem;
             font-weight: 800;
             letter-spacing: -0.5px;
+            color: white;
+        }
+        .header-divider {
+            height: 3px;
+            background-color: #ffffff;
+            width: 100%;
+            max-width: 650px;
+            margin: 15px 0;
         }
         .hero p {
-            max-width: 600px;
-            margin: 15px auto 0;
+            margin: 0;
+            color: white;
             font-size: 1.1rem;
-            color: #cbd5e1;
+            opacity: 0.95;
+            max-width: 750px;
+        }
+
+        /* Hero Actions & Badges */
+        .header-actions { 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            margin-top: 25px; 
+        }
+        .badge { 
+            background: rgba(255,255,255,0.2); 
+            border: 1px solid rgba(255,255,255,0.4); 
+            color: white; 
+            padding: 6px 12px; 
+            border-radius: 20px; 
+            font-size: 0.85rem; 
+            font-weight: bold; 
+        }
+        .contact-btn { 
+            background: #ffffff; 
+            color: #0069fa; 
+            border: none; 
+            padding: 8px 20px; 
+            border-radius: 6px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            font-size: 0.95rem; 
+            text-decoration: none;
+            transition: background-color 0.2s, transform 0.1s; 
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .contact-btn:hover { 
+            background-color: #f1f5f9; 
+            transform: translateY(-1px);
         }
 
         /* --- Main Content Grid --- */
         .container {
-            max-width: 1000px;
+            max-width: 1100px;
             margin: 40px auto;
             padding: 0 20px;
         }
         .tools-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 25px;
         }
 
@@ -52,7 +104,7 @@
             background: #ffffff;
             border: 1px solid #e2e8f0;
             border-radius: 12px;
-            padding: 25px;
+            padding: 30px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.02);
             display: flex;
             flex-direction: column;
@@ -60,7 +112,8 @@
         }
         .card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.08);
+            border-color: #cbd5e1;
         }
         .card-icon {
             font-size: 2.5rem;
@@ -69,38 +122,38 @@
         .card h2 {
             margin: 0 0 10px 0;
             color: #0f172a;
-            font-size: 1.3rem;
+            font-size: 1.4rem;
         }
         .card p {
-            margin: 0 0 20px 0;
+            margin: 0 0 25px 0;
             color: #64748b;
-            font-size: 0.95rem;
+            font-size: 1rem;
             flex-grow: 1;
         }
         
-        /* --- Buttons --- */
+        /* --- Card Buttons --- */
         .btn {
             display: inline-block;
-            background-color: #3b82f6;
+            background-color: #0069fa;
             color: #ffffff;
             text-decoration: none;
             text-align: center;
-            padding: 10px 20px;
+            padding: 12px 20px;
             border-radius: 6px;
             font-weight: bold;
             font-size: 0.95rem;
             transition: background-color 0.2s;
         }
         .btn:hover {
-            background-color: #2563eb;
+            background-color: #0056cc;
         }
         .btn-outline {
             background-color: transparent;
-            color: #3b82f6;
-            border: 2px solid #3b82f6;
+            color: #0069fa;
+            border: 2px solid #0069fa;
         }
         .btn-outline:hover {
-            background-color: #eff6ff;
+            background-color: #f1f5f9;
         }
         
         /* --- Footer --- */
@@ -117,8 +170,16 @@
 <body>
 
     <div class="hero">
-        <h1>TargetConnect Community Tools</h1>
-        <p>I built these tools as a way to easily customize and extract data from TargetConnect. They are open-source and ready to be used by the wider university community.</p>
+        <div class="hero-content">
+            <h1>TargetConnect Community Tools</h1>
+            <div class="header-divider"></div>
+            <p>I built these tools as a way to easily customize, stylize, and extract data from TargetConnect. They are open-source, totally free, and ready to be used by the wider university community.</p>
+            
+            <div class="header-actions">
+                <span class="badge">Open Source Hub</span>
+                <a href="mailto:mike.henson@sunderland.ac.uk" class="contact-btn">✉️ Contact Me</a>
+            </div>
+        </div>
     </div>
 
     <div class="container">
@@ -126,29 +187,36 @@
             
             <div class="card">
                 <div class="card-icon">🛠️</div>
-                <h2>Custom Pane Maker</h2>
+                <h2>Universal Custom Pane Maker</h2>
                 <p>Generate responsive, dynamic HTML banners for TargetConnect. Easily segment who sees what using Apache Velocity logic and user tags—no coding required.</p>
                 <a href="TC-Custom-Pane-Builder.html" class="btn">Launch Builder</a>
             </div>
 
             <div class="card">
+                <div class="card-icon">📆</div>
+                <h2>Interactive Event Calendar</h2>
+                <p>A fully functional monthly calendar view for your students. This widget seamlessly reads your TargetConnect Events RSS feed to automatically populate dates and provide clickable, pop-up details.</p>
+                <a href="event-calendar.html" class="btn btn-outline">View Live Demo</a>
+            </div>
+
+            <div class="card">
                 <div class="card-icon">✏️</div>
                 <h2>Event HTML Builder</h2>
-                <p>Ensure your events always look perfectly formatted. This tool turns basic text inputs into highly styled, responsive HTML ready to paste into event descriptions.</p>
+                <p>Ensure your event descriptions always look perfectly formatted. This tool turns basic text inputs into highly styled, responsive HTML ready to paste directly into TargetConnect.</p>
                 <a href="event-builder.html" class="btn">Launch Builder</a>
             </div>
 
             <div class="card">
                 <div class="card-icon">📅</div>
-                <h2>Events RSS Widget</h2>
-                <p>A plug-and-play widget that translates the TargetConnect Events RSS feed into a clean, modern grid layout. Perfect for embedding into VLEs or student portals.</p>
+                <h2>Events List Widget</h2>
+                <p>A plug-and-play widget that translates the standard TargetConnect Events RSS feed into a clean, modern grid layout. Perfect for embedding into VLEs or student portals.</p>
                 <a href="events-rss-feed.html" class="btn btn-outline">View Live Demo</a>
             </div>
 
             <div class="card">
                 <div class="card-icon">💼</div>
-                <h2>Vacancies RSS Widget</h2>
-                <p>A sleek, responsive list widget that pulls your latest live job vacancies from the TargetConnect RSS feed, complete with dynamic deadline tracking.</p>
+                <h2>Vacancies List Widget</h2>
+                <p>A sleek, responsive list widget that pulls your latest live job vacancies from the TargetConnect RSS feed, complete with dynamic deadline tracking and company details.</p>
                 <a href="vacancies.html" class="btn btn-outline">View Live Demo</a>
             </div>
 
@@ -156,7 +224,7 @@
     </div>
 
     <div class="footer">
-        Built to make TargetConnect work harder for our students and staff.
+        Built by Mike Henson to make TargetConnect work harder for our students and staff.
     </div>
 
 </body>
