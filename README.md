@@ -58,7 +58,7 @@ This project is licensed under the **Creative Commons Attribution-NonCommercial 
 
 **What this means:**
 - ✅ **Universities & Staff:** You are free to use, modify, and share these tools for your institution's internal use.
-- ❌ **Commercial Entities:** Use of this code within commercial products or for-profit services (including by platform providers like GTI/TargetConnect) is strictly prohibited without a separate commercial agreement.
+- ❌ **Commercial Entities:** Use of this code within commercial products or for-profit services is strictly prohibited without a separate commercial agreement.
 
 *Disclaimer: These tools are independent resources and are not officially affiliated with GTI or the TargetConnect platform.*
 
