@@ -86,9 +86,22 @@
             transform: translateY(-1px);
         }
 
+        /* --- Section Titles --- */
+        .section-header {
+            max-width: 1100px;
+            margin: 50px auto 20px auto;
+            padding: 0 20px;
+            font-size: 1.8rem;
+            color: #0f172a;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+            font-weight: 800;
+        }
+
+        /* --- Grid & Cards --- */
         .container {
             max-width: 1100px;
-            margin: 40px auto;
+            margin: 0 auto 40px auto;
             padding: 0 20px;
         }
         .tools-grid {
@@ -143,6 +156,12 @@
         .btn:hover {
             background-color: #0056cc;
         }
+        .btn-external {
+            background-color: #475569;
+        }
+        .btn-external:hover {
+            background-color: #334155;
+        }
         
         .footer {
             text-align: center;
@@ -169,6 +188,7 @@
         </div>
     </div>
 
+    <h2 class="section-header">Core Portal Builders</h2>
     <div class="container">
         <div class="tools-grid">
             
@@ -205,6 +225,27 @@
                 <h2>Vacancies List Widget Maker</h2>
                 <p>Turn your Vacancies RSS feed into a sleek, responsive job board widget. Features dynamic deadline tracking, employer icons, and customizable layouts.</p>
                 <a href="vancancies-feed-builder.html" class="btn">Launch Maker</a>
+            </div>
+
+        </div>
+    </div>
+
+    <h2 class="section-header">Other Useful Tools</h2>
+    <div class="container">
+        <div class="tools-grid">
+            
+            <div class="card">
+                <div class="card-icon">📱</div>
+                <h2>QR Code Maker</h2>
+                <p>It's notoriously difficult to find a free QR generator that doesn't force you to create an account. This tool lets you instantly generate and download transparent, high-res QR codes for your posters—100% free and private.</p>
+                <a href="qr-maker.html" class="btn">Launch Maker</a>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">🪟</div>
+                <h2>Iframe Generator <span style="font-size: 0.9rem; font-weight: normal; color: #94a3b8;">(3rd Party)</span></h2>
+                <p>A brilliant third-party tool for generating clean iframe embed codes. Super useful for quickly embedding external web pages, forms, or multimedia resources directly into Pathway activities and custom panes.</p>
+                <a href="https://iframe-generator.org/" target="_blank" class="btn btn-external">Visit Website ↗</a>
             </div>
 
         </div>
