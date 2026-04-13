@@ -30,7 +30,6 @@
         .tool-header p { margin: 0; color: rgba(255,255,255,0.95); font-size: 1.05rem; }
         
         .header-actions { display: flex; align-items: center; gap: 15px; margin-top: 20px; }
-        .badge { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); color: white; padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; }
         .how-to-use-btn { background: #ffffff; color: #0069fa; border: none; padding: 8px 18px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.95rem; transition: all 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.1);}
         .how-to-use-btn:hover { background-color: #f8fafc; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15);}
 
@@ -103,7 +102,6 @@
             <div class="header-divider"></div>
             <p>Build and customize accessible, interactive web components without touching a single line of code.</p>
             <div class="header-actions">
-                <span class="badge">Headless Architecture v3.0</span>
                 <button class="how-to-use-btn" onclick="openHelpModal()">🌐 How to Host & Embed</button>
             </div>
         </div>
@@ -168,7 +166,7 @@
                 <h3>Option 1: The IT Department Route (Recommended)</h3>
                 <p>If you are building this for an official university or corporate platform, your IT team will have a server.</p>
                 <div class="instruction-box">
-                    <strong>1.</strong> Click "Copy HTML Code" from this builder.<br>
+                    <strong>1.</strong> Click "Copy Snippet" from this builder.<br>
                     <strong>2.</strong> Open a plain text editor (like Notepad on Windows or TextEdit on Mac), paste the code, and save the file as <code>my-widget.html</code>.<br>
                     <strong>3.</strong> Send this file to your IT or Web team and ask them to host it on the university/company server.<br>
                     <strong>4.</strong> They will give you back a URL (e.g., <code>https://your-uni.edu/assets/my-widget.html</code>).<br>
@@ -193,6 +191,7 @@
     <script>
         let currentWidget = 'flashcards';
         let itemCount = 0;
+        let previewTimeout; // Timer for debouncing the live preview
 
         // --- Accessibility Helper ---
         function getContrastColor(hexColor) {
@@ -206,13 +205,11 @@
         }
 
         // --- Core Headless Generator ---
-        // This generates the sleek, 30-line HTML snippet that pulls from your Kinsta CDN
         function generateHeadlessHTML(theme, data, widgetType) {
             const dataString = JSON.stringify(data, null, 4);
             const primaryText = getContrastColor(theme.primary);
             const bgText = getContrastColor(theme.bg);
             
-            // Note: Added a cache-buster query (?v=1) to Kinsta URLs to ensure fresh loading.
             return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -220,7 +217,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive Widget</title>
     
-    <link rel="stylesheet" href="https://mh-rss-rqaco.kinsta.page/universal/universal-widgets.css?v=1">
+    <link rel="stylesheet" href="https://mh-rss-rqaco.kinsta.page/universal/universal-widgets.css?v=2">
 
     <style>
         :root {
@@ -247,7 +244,7 @@
         window.widgetData = ${dataString};
     <\/script>
 
-    <script src="https://mh-rss-rqaco.kinsta.page/universal/universal-widgets.js?v=1"><\/script>
+    <script src="https://mh-rss-rqaco.kinsta.page/universal/universal-widgets.js?v=2"><\/script>
 
 </body>
 </html>`;
@@ -261,7 +258,6 @@
             container.innerHTML = '';
             itemCount = 0;
             
-            // Add initial default items based on widget type
             if (currentWidget === 'flashcards') {
                 addItem({ tag: "Leadership", question: "Tell us about a time you've demonstrated effective leadership.", s: "Team morale was low.", t: "I needed to get the group back on track.", a: "I organised a meeting.", r: "We finished early.", r2: "I learned to listen."});
             } else if (currentWidget === 'roulette') {
@@ -371,6 +367,9 @@
         }
 
         function updatePreview() {
+            // Debounce the iframe rendering so it doesn't crash while typing
+            clearTimeout(previewTimeout);
+            
             const theme = {
                 primary: document.getElementById('color-primary').value,
                 bg: document.getElementById('color-bg').value,
@@ -378,17 +377,13 @@
             };
             const data = gatherData();
             
-            // Generate the tiny headless snippet using the Kinsta URLs
             let htmlCode = generateHeadlessHTML(theme, data, currentWidget);
-
-            // Update textarea
             document.getElementById('code-output').value = htmlCode;
             
-            // Update iframe - because the iframe has 'allow-scripts', it will actually
-            // execute the generated HTML, download the CSS/JS from your Kinsta server, 
-            // and render the live widget right inside the builder!
-            const iframe = document.getElementById('preview-frame');
-            iframe.srcdoc = htmlCode;
+            previewTimeout = setTimeout(() => {
+                const iframe = document.getElementById('preview-frame');
+                iframe.srcdoc = htmlCode;
+            }, 350); // Waits 350ms after you stop typing to render the preview
         }
 
         function copyHTMLCode() {
@@ -412,7 +407,6 @@
             if (event.target == modal) { closeHelpModal(); }
         }
 
-        // Initialize Builder
         switchWidget();
 
     </script>
