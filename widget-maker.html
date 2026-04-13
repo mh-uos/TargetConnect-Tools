@@ -191,9 +191,8 @@
     <script>
         let currentWidget = 'flashcards';
         let itemCount = 0;
-        let previewTimeout; // Timer for debouncing the live preview
+        let previewTimeout;
 
-        // --- Accessibility Helper ---
         function getContrastColor(hexColor) {
             if (!hexColor) return '#1e293b';
             const hex = hexColor.replace('#', '');
@@ -204,7 +203,7 @@
             return (yiq >= 128) ? '#1e293b' : '#ffffff';
         }
 
-        // --- Core Headless Generator ---
+        // Updated to use v=4 for both files to break the old cache
         function generateHeadlessHTML(theme, data, widgetType) {
             const dataString = JSON.stringify(data, null, 4);
             const primaryText = getContrastColor(theme.primary);
@@ -217,7 +216,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive Widget</title>
     
-    <link rel="stylesheet" href="https://mh-rss-rqaco.kinsta.page/universal/universal-widgets.css?v=2">
+    <link rel="stylesheet" href="https://mh-rss-rqaco.kinsta.page/universal/universal-widgets.css?v=4">
 
     <style>
         :root {
@@ -244,13 +243,11 @@
         window.widgetData = ${dataString};
     <\/script>
 
-    <script src="https://mh-rss-rqaco.kinsta.page/universal/universal-widgets.js?v=2"><\/script>
+    <script src="https://mh-rss-rqaco.kinsta.page/universal/universal-widgets.js?v=4"><\/script>
 
 </body>
 </html>`;
         }
-
-        // --- Builder UI Logic ---
 
         function switchWidget() {
             currentWidget = document.getElementById('widget-type').value;
@@ -367,7 +364,6 @@
         }
 
         function updatePreview() {
-            // Debounce the iframe rendering so it doesn't crash while typing
             clearTimeout(previewTimeout);
             
             const theme = {
@@ -383,7 +379,7 @@
             previewTimeout = setTimeout(() => {
                 const iframe = document.getElementById('preview-frame');
                 iframe.srcdoc = htmlCode;
-            }, 350); // Waits 350ms after you stop typing to render the preview
+            }, 350); 
         }
 
         function copyHTMLCode() {
@@ -393,7 +389,6 @@
             alert('Headless Snippet Copied! Follow the "How to Host" instructions to get this live.');
         }
 
-        // --- Modal Logic ---
         function openHelpModal() {
             document.getElementById('help-modal').style.display = 'flex';
             document.body.style.overflow = 'hidden'; 
